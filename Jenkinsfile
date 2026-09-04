@@ -2,10 +2,18 @@ pipeline {
     agent any
 
     stages {
-        stage('Checkout Test') {
+
+        stage('Checkout') {
             steps {
-                echo 'Jenkins is connected to GitHub'
+                checkout scm
             }
         }
+
+        stage('Docker Build') {
+            steps {
+                sh 'sudo docker build -t my-portfolio:jenkins .'
+            }
+        }
+
     }
 }
