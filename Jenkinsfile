@@ -34,17 +34,27 @@ pipeline {
             }
         }
 
-        stage('Kubernetes Connection Test') {
+        stage('Kubernetes Deploy') {
             steps {
                 withCredentials([
-                    string(credentialsId: 'jenkins-k8s-token', variable: 'KUBE_TOKEN')
+                    string(
+                        credentialsId: 'jenkins-k8s-token',
+                        variable: 'KUBE_TOKEN'
+                    )
                 ]) {
                     sh '''
                         kubectl \
                         --server=https://172.31.27.252:6443 \
                         --token="$KUBE_TOKEN" \
                         --insecure-skip-tls-verify=true \
-                        get nodes
+                        set image deployment/my-portfolio \
+                        my-portfolio=aligarveeresh/my-portfolio:v1
+
+                        kubectl \
+                        --server=https://172.31.27.252:6443 \
+                        --token="$KUBE_TOKEN" \
+                        --insecure-skip-tls-verify=true \
+                        rollout status deployment/my-portfolio
                     '''
                 }
             }
