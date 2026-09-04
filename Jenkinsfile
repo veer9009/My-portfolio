@@ -15,6 +15,25 @@ pipeline {
             }
         }
 
+        stage('Docker Push') {
+            steps {
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'dockerhub-credentials',
+                        usernameVariable: 'DOCKER_USER',
+                        passwordVariable: 'DOCKER_PASS'
+                    )
+                ]) {
+                    sh '''
+                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                        docker tag my-portfolio:jenkins $DOCKER_USER/my-portfolio:v1
+                        docker push $DOCKER_USER/my-portfolio:v1
+                        docker logout
+                    '''
+                }
+            }
+        }
+
         stage('Kubernetes Connection Test') {
             steps {
                 withCredentials([
