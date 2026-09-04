@@ -11,7 +11,7 @@ pipeline {
 
         stage('Docker Build') {
             steps {
-                sh 'docker build -t my-portfolio:jenkins .'
+                sh 'docker build -t my-portfolio:${BUILD_NUMBER} .'
             }
         }
 
@@ -26,8 +26,8 @@ pipeline {
                 ]) {
                     sh '''
                         echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-                        docker tag my-portfolio:jenkins $DOCKER_USER/my-portfolio:v1
-                        docker push $DOCKER_USER/my-portfolio:v1
+                        docker tag my-portfolio:${BUILD_NUMBER} $DOCKER_USER/my-portfolio:${BUILD_NUMBER}
+                        docker push $DOCKER_USER/my-portfolio:${BUILD_NUMBER}
                         docker logout
                     '''
                 }
@@ -38,21 +38,19 @@ pipeline {
             steps {
                 withCredentials([
                     string(
-                        credentialsId: 'jenkins-k8s-token',
+                        credentialsId: 'kube-token',
                         variable: 'KUBE_TOKEN'
                     )
                 ]) {
                     sh '''
-                        kubectl \
-                        --server=https://172.31.27.252:6443 \
-                        --token="$KUBE_TOKEN" \
+                        kubectl --server=https://172.31.27.252:6443 \
+                        --token=$KUBE_TOKEN \
                         --insecure-skip-tls-verify=true \
                         set image deployment/my-portfolio \
-                        my-portfolio=aligarveeresh/my-portfolio:v1
+                        my-portfolio=$DOCKER_USER/my-portfolio:${BUILD_NUMBER}
 
-                        kubectl \
-                        --server=https://172.31.27.252:6443 \
-                        --token="$KUBE_TOKEN" \
+                        kubectl --server=https://172.31.27.252:6443 \
+                        --token=$KUBE_TOKEN \
                         --insecure-skip-tls-verify=true \
                         rollout status deployment/my-portfolio
                     '''
