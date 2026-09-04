@@ -11,7 +11,7 @@ pipeline {
 
         stage('Docker Build') {
             steps {
-                sh 'sudo docker build -t my-portfolio:jenkins .'
+                sh 'docker build -t my-portfolio:jenkins .'
             }
         }
 
