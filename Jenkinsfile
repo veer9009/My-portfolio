@@ -38,7 +38,7 @@ pipeline {
             steps {
                 withCredentials([
                     string(
-                        credentialsId: 'kube-token',
+                        credentialsId: 'jenkins-k8s-token',
                         variable: 'KUBE_TOKEN'
                     )
                 ]) {
