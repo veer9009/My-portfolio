@@ -1,0 +1,15 @@
+{
+  "name": "veeresh-portfolio",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node tools/server.cjs",
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.61.1"
+  },
+  "dependencies": {
+    "gsap": "3.14.2"
+  }
+}
