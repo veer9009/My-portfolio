@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1200" viewBox="0 0 1920 1200">
+  <defs>
+    <radialGradient id="air"><stop stop-color="#19415b"/><stop offset=".5" stop-color="#0d2134"/><stop offset="1" stop-color="#060b13"/></radialGradient>
+    <linearGradient id="rack"><stop stop-color="#142b3c"/><stop offset="1" stop-color="#070e18"/></linearGradient>
+    <linearGradient id="floor" x2="0" y2="1"><stop stop-color="#163044"/><stop offset="1" stop-color="#080d14"/></linearGradient>
+    <pattern id="slots" width="70" height="30" patternUnits="userSpaceOnUse"><path d="M6 8h48M6 12h48" stroke="#34718c" stroke-opacity=".4"/><path d="M60 8h3" stroke="#65d7ec"/></pattern>
+    <g id="cabinet"><rect width="140" height="590" rx="5" fill="url(#rack)" stroke="#28465c"/><rect x="15" y="26" width="110" height="510" fill="url(#slots)"/><path d="M8 565h124" stroke="#d69355" stroke-opacity=".6"/></g>
+  </defs>
+  <path fill="url(#air)" d="M0 0h1920v1200H0z"/>
+  <path d="M0 950 1200 590 1920 940v260H0z" fill="url(#floor)"/>
+  <g opacity=".42" stroke="#4a8aa4" stroke-width="1">
+    <path d="M0 1200 1200 590 400 1200M800 1200 1200 590 1200 1200M1600 1200 1200 590 1920 1200M0 1060h1920M260 870h1460M710 720h790M940 650h420"/>
+    <path d="M0 0 1200 480 1920 0M0 160 1200 480 1920 150M0 330 1200 480 1920 330" opacity=".3"/>
+  </g>
+  <g opacity=".7"><use href="#cabinet" transform="translate(1740 190) scale(1.5)"/><use href="#cabinet" transform="translate(1530 280) scale(1.08)"/><use href="#cabinet" transform="translate(1380 360) scale(.76)"/><use href="#cabinet" transform="translate(1270 410) scale(.54)"/></g>
+  <g opacity=".3"><use href="#cabinet" transform="translate(50 140) scale(1.5)"/><use href="#cabinet" transform="translate(380 275) scale(1.08)"/><use href="#cabinet" transform="translate(640 350) scale(.76)"/><use href="#cabinet" transform="translate(880 410) scale(.54)"/></g>
+  <path d="M1000 1200 1200 590 1450 1200" fill="none" stroke="#52d9f0" stroke-opacity=".22" stroke-width="3"/>
+  <path d="M1560 0 1270 430" stroke="#df9c60" stroke-opacity=".25" stroke-width="3"/>
+</svg>

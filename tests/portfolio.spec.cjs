@@ -6,19 +6,19 @@ for (const width of [1920, 1440, 1024, 768, 430, 390]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto('/');
     await expect(page.locator('h1')).toContainText('VEERESH');
-    await expect(page.locator('.hero-role')).toHaveText('DevOps Engineer & Team Lead');
-    await page.waitForTimeout(1800);
-    expect(await page.evaluate(() => !!window.ScrollTrigger && ScrollTrigger.getAll().length > 5)).toBe(true);
+    await expect(page.locator('.hero-role')).toHaveText('Software Engineer & Team Lead');
+    await expect.poll(() => page.evaluate(() => !!window.ScrollTrigger && ScrollTrigger.getAll().length > 5)).toBe(true);
     for (const id of ['about', 'experience', 'professional-projects', 'personal-projects', 'skills', 'credentials', 'contact']) {
       await page.locator(`#${id}`).scrollIntoViewIfNeeded();
-      await page.waitForTimeout(1000);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       const heading = page.locator(`#${id} h2`);
       await expect(heading).toBeVisible();
-      expect(await heading.evaluate(el => +getComputedStyle(el).opacity)).toBeGreaterThan(0.9);
-      for (const word of await heading.locator('.motion-word').all()) {
-        expect(await word.evaluate(el => +getComputedStyle(el).opacity)).toBeGreaterThan(0.9);
-      }
+      // Wait for actual reveal completion and inspect every word in one browser
+      // call rather than accumulating fixed sleeps and a round trip per word.
+      await expect.poll(() => heading.evaluate(el => Math.min(
+        +getComputedStyle(el).opacity,
+        ...[...el.querySelectorAll('.motion-word')].map(word => +getComputedStyle(word).opacity)
+      ))).toBeGreaterThan(0.9);
     }
     // One-shot reveals release their triggers as they complete. The persistent
     // progress and timeline triggers must still exist at the bottom of the page.

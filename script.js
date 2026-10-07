@@ -4,6 +4,23 @@
   const menu = document.querySelector('.menu-toggle');
   const nav = document.querySelector('.nav');
   const header = document.querySelector('.site-header');
+  const systemPanel = document.querySelector('.system-panel');
+  if (systemPanel) {
+    const panelViewport = matchMedia('(min-width: 1280px)');
+    const heroLayout = document.querySelector('.hero-layout');
+    const placePanel = () => {
+      // Keep the phone card outside the pinned section so existing CTAs stay reachable.
+      if (panelViewport.matches) heroLayout.append(systemPanel);
+      else document.querySelector('.capability-strip').before(systemPanel);
+      heroLayout.classList.toggle('has-system-panel', panelViewport.matches);
+      window.ScrollTrigger?.refresh();
+    };
+    placePanel();
+    panelViewport.addEventListener('change', placePanel);
+    window.addEventListener('pagehide', event => {
+      if (!event.persisted) panelViewport.removeEventListener('change', placePanel);
+    });
+  }
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
   const links = [...nav.querySelectorAll('a')];
   function closeMenu(returnFocus = false) {
@@ -54,6 +71,24 @@
   }
   if (!window.gsap || !window.ScrollTrigger) return;
   gsap.registerPlugin(ScrollTrigger);
+  // Pin measurements temporarily reset scroll position. CSS smooth scrolling
+  // must not animate those resets or the hero's start is measured mid-scroll.
+  let refreshScrollFrame = 0;
+  let savedScrollBehavior;
+  const refreshScrollStart = () => {
+    cancelAnimationFrame(refreshScrollFrame);
+    if (savedScrollBehavior === undefined) savedScrollBehavior = document.documentElement.style.scrollBehavior;
+    document.documentElement.style.scrollBehavior = 'auto';
+  };
+  const refreshScrollEnd = () => {
+    refreshScrollFrame = requestAnimationFrame(() => {
+      document.documentElement.style.scrollBehavior = savedScrollBehavior;
+      savedScrollBehavior = undefined;
+      refreshScrollFrame = 0;
+    });
+  };
+  ScrollTrigger.addEventListener('refreshInit', refreshScrollStart);
+  ScrollTrigger.addEventListener('refresh', refreshScrollEnd);
   // Context owns all animation/ScrollTrigger instances. matchMedia reverts on
   // preference and breakpoint changes; listeners are removed in each context.
   const media = gsap.matchMedia();
@@ -87,7 +122,9 @@
       .from('.hero h1 > span', { y: 30, opacity: 0, stagger: .14 }, '-=.65')
       .from('.hero-headline, .hero-description, .hero-actions', { y: 20, opacity: 0, stagger: .12 }, '-=.6')
       .from('.pipeline', { y: 24, opacity: 0, duration: 1 }, '-=.9')
-      .from('.pipeline-node', { x: 16, opacity: 0, stagger: .08, duration: .5 }, '-=.6');
+      .from('.pipeline-node', { x: 16, opacity: 0, stagger: .08, duration: .5 }, '-=.6')
+      // This HTML panel stays visible from first paint; only its position enters.
+      .from('.system-panel', { y: 8, duration: .55, clearProps: 'transform' }, 0);
     gsap.utils.toArray('.reveal-heading').forEach(heading => {
       gsap.from(heading.querySelectorAll('.motion-word'), { y: desktop ? 24 : 12, opacity: 0, duration: .65, stagger: .035, ease: 'power2.out', scrollTrigger: { trigger: heading, start: 'top 93%', once: true } });
     });
@@ -101,25 +138,8 @@
     gsap.from('.production-summary .tags > span', { y: 10, opacity: 0, stagger: .08, scrollTrigger: { trigger: '.production-summary .tags', start: 'top 93%', once: true } });
     gsap.to('.scroll-progress', { scaleX: 1, ease: 'none', scrollTrigger: { trigger: document.documentElement, start: 0, end: 'max', scrub: .15 } });
     if (desktop) {
-      gsap.to('.hero-grid', { y: 100, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: 1 } });
       gsap.to('.visual-grid', { y: 45, ease: 'none', scrollTrigger: { trigger: '.production-visual', start: 'top bottom', end: 'bottom top', scrub: 1 } });
     }
-    // Pause ambient motion outside the viewport instead of consuming work
-    // throughout the page. Terminal commands are explicitly illustrative.
-    const ambient = gsap.timeline({ repeat: -1, paused: true });
-    ambient.to('.pipeline-connection > span', { y: 38, duration: 1.5, stagger: .25, ease: 'none' })
-      .to('.terminal-cursor', { opacity: 0, duration: .5, repeat: 1, yoyo: true }, 0);
-    const commands = ['git push', 'docker build', 'docker push', 'kubectl apply', 'kubectl rollout status'];
-    let commandIndex = 0;
-    ambient.call(() => { commandIndex = (commandIndex + 1) % commands.length; document.querySelector('.terminal-command').textContent = commands[commandIndex]; });
-    let inView = true;
-    const observer = new IntersectionObserver(entries => {
-      inView = entries[0].isIntersecting;
-      if (inView && !document.hidden) ambient.play(); else ambient.pause();
-    });
-    observer.observe(document.querySelector('.pipeline'));
-    const visibility = () => { if (document.hidden || !inView) ambient.pause(); else ambient.play(); };
-    document.addEventListener('visibilitychange', visibility);
     const hoverCleanups = [];
     if (matchMedia('(hover: hover)').matches) {
       document.querySelectorAll('.button, .contact-arrow, .tech-card, .portfolio-preview').forEach(element => {
@@ -131,7 +151,6 @@
       });
     }
     return () => {
-      observer.disconnect(); document.removeEventListener('visibilitychange', visibility);
       hoverCleanups.forEach(cleanup => cleanup());
       headingOriginals.forEach(([heading, html]) => { heading.innerHTML = html; });
       headingOriginals = [];

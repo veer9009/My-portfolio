@@ -23,14 +23,33 @@ export function createScene(T, canvas, mobile) {
   const statuses = ['CODE', 'BUILD', 'PACKAGE', 'DEPLOY', 'HEALTHY'];
   const nodes = names.map((name, i) => {
     const group = new T.Group();
-    group.position.set(i % 2 ? .45 : -.45, 4.6 - i * 2.3, (i % 3) * -.45);
+    group.position.set(i % 2 ? .45 : -.45, 4.6 - i * 2.3, -i * 1.1);
     group.rotation.y = i % 2 ? -.07 : .07;
     group.add(new T.Mesh(box, body));
-    const border = keep(new T.LineBasicMaterial({ color: 0x52d9f0, transparent: true, opacity: .45 }));
+    const colors = [0xb4d5e8, 0xe5a268, 0x52c6f0, 0x7c9fff, 0xffb764];
+    const border = keep(new T.LineBasicMaterial({ color: colors[i], transparent: true, opacity: .45 }));
     group.add(new T.LineSegments(edges, border));
+    const accent = keep(new T.MeshStandardMaterial({ color: colors[i], emissive: colors[i], emissiveIntensity: .25, metalness: .6, roughness: .35 }));
+    // Hardware silhouettes share mounting rails, but differ by their role.
+    if (i === 0) {
+      const geometry = keep(new T.TorusGeometry(.23, .035, 6, 18));
+      for (const x of [-1, 0, 1]) { const socket = new T.Mesh(geometry, accent); socket.position.set(x, .95, 0); group.add(socket); }
+    } else if (i === 1) {
+      const geometry = keep(new T.BoxGeometry(.5, .16, .65));
+      for (let j = 0; j < 4; j++) { const blade = new T.Mesh(geometry, accent); blade.position.set(2.95, -.4 + j * .27, 0); group.add(blade); }
+    } else if (i === 2) {
+      const geometry = keep(new T.BoxGeometry(.6, .3, .6));
+      for (let j = 0; j < 6; j++) { const container = new T.Mesh(geometry, accent); container.position.set(-.75 + (j % 3) * .75, .95 + Math.floor(j / 3) * .36, -.1); group.add(container); }
+    } else if (i === 3) {
+      const geometry = keep(new T.CylinderGeometry(.15, .15, .45, 6));
+      for (let j = 0; j < 3; j++) { const cluster = new T.Mesh(geometry, accent); cluster.rotation.x = Math.PI / 2; cluster.position.set(3.1, -.4 + j * .4, 0); group.add(cluster); }
+    } else {
+      const geometry = keep(new T.SphereGeometry(.3, mobile ? 8 : 12, 6));
+      for (let j = 0; j < 3; j++) { const cloud = new T.Mesh(geometry, accent); cloud.scale.set(1, .65, .7); cloud.position.set((j - 1) * .4, .95, 0); group.add(cloud); }
+    }
     const label = document.createElement('canvas'); label.width = 768; label.height = 240;
     const ctx = label.getContext('2d');
-    ctx.fillStyle = '#65d7ec'; ctx.font = '22px monospace'; ctx.fillText(roles[i], 36, 62);
+    ctx.fillStyle = `#${colors[i].toString(16).padStart(6, '0')}`; ctx.font = '22px monospace'; ctx.fillText(roles[i], 36, 62);
     ctx.fillStyle = '#edf2f7'; ctx.font = 'bold 55px sans-serif'; ctx.fillText(name, 34, 142);
     ctx.fillStyle = '#8faabb'; ctx.font = '22px monospace'; ctx.fillText(`0${i + 1}`, 670, 66);
     ctx.fillStyle = '#52d9f0'; ctx.fillRect(36, 186, 190, 3);
@@ -79,6 +98,19 @@ export function createScene(T, canvas, mobile) {
   const grid = new T.GridHelper(40, 24, 0x27637b, 0x153044);
   grid.position.set(0, -6.5, -6); scene.add(grid);
   keep(grid.geometry); keep(grid.material);
+  // Shared chassis and distant racks anchor the nodes in an infrastructure bay.
+  const railGeometry = keep(new T.BoxGeometry(.06, 12, .12));
+  for (const x of [-3.4, 3.4]) {
+    const rail = new T.Mesh(railGeometry, body); rail.position.set(x, 0, -3); scene.add(rail);
+  }
+  const rackGeometry = keep(new T.BoxGeometry(.55, 10, 1.3));
+  for (let i = 0; i < (mobile ? 4 : 8); i++) {
+    const rack = new T.Mesh(rackGeometry, body);
+    rack.position.set((i % 2 ? 1 : -1) * (4.8 + Math.floor(i / 2) * .7), 0, -6 - Math.floor(i / 2) * 2);
+    scene.add(rack);
+  }
+  const warm = new T.PointLight(0xffae62, mobile ? 8 : 18, 18, 2);
+  warm.position.set(3, -4, 3); scene.add(warm);
   // Soft glow sprite supplies atmosphere without bloom render passes.
   const glowCanvas = document.createElement('canvas'); glowCanvas.width = glowCanvas.height = 128;
   const glowCtx = glowCanvas.getContext('2d');
@@ -100,12 +132,12 @@ export function createScene(T, canvas, mobile) {
         const strength = Math.max(0, 1 - Math.abs(state.stage - i));
         node.border.opacity = .4 + strength * .55;
         node.group.scale.setScalar(1 + strength * .045);
-        node.group.position.y = node.baseY + (state.motion ? Math.sin(time * .55 + i) * .045 : 0);
+        node.group.position.y = node.baseY;
       });
       paths.forEach(({ curve, packets }, i) => packets.forEach((packet, j) => {
-        curve.getPoint((time * .24 + j / packets.length + i * .15) % 1, packet.position);
+        curve.getPoint((state.progress * 3 + j / packets.length + i * .15) % 1, packet.position);
       }));
-      field.rotation.y = state.motion ? Math.sin(time * .03) * .035 : 0;
+      field.rotation.y = state.motion ? state.progress * .035 : 0;
       renderer.render(scene, camera);
     },
     dispose() {

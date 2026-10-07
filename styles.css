@@ -1534,5 +1534,103 @@ footer>a:last-child {
 .scroll-progress {
   display:none
 }
+}
 
+/* Cinematic enhancement stays isolated from the existing portfolio sections. */
+.hero { isolation:isolate; max-width:none; min-height:calc(100svh - 69px); }
+.cinematic-background {
+  position:absolute; inset:-3%; z-index:-2; pointer-events:none;
+  background:#080d14 url('assets/cloud-city-desktop.webp') center / cover no-repeat;
+  translate:var(--pointer-x,0px) var(--pointer-y,0px);
+  transform-origin:65% 45%;
+}
+.hero::before {
+  z-index:-1;
+  background:linear-gradient(90deg,#080d14ed 5%,#080d1470 55%,#080d1440),linear-gradient(0deg,#080d14,transparent 25%,transparent 85%,#080d1499);
+}
+.hero-topline,.hero-footer { z-index:2; }
+.hero-disciplines { color:#c3d8e5; font-size:12px; margin-top:18px; line-height:1.8; }
+.hero-copy { text-shadow:0 2px 18px #080d14; }
+.hero-layout { min-height:calc(100svh - 205px); }
+.pipeline { padding:18px 14px; border:1px solid #82bed31c; border-radius:6px; background:linear-gradient(140deg,#0b182088,#080d1422); }
+.scene-ready:not(.scene-static) .hero-scene { top:45px; bottom:108px; left:-20px; right:-20px; }
+.pipeline-stage { color:#b8d9e9; }
+@media(max-width:900px) {
+  .hero-layout { gap:24px; }
+  .hero-disciplines { font-size:10px; }
+}
+@media(max-width:600px) {
+  .hero { padding:20px 24px; min-height:calc(100svh - 69px); }
+  .hero-layout { gap:22px; padding:24px 0; min-height:0; }
+  .hero h1 { font-size:clamp(56px,16vw,80px); }
+  .hero-role { margin-bottom:12px; }
+  .hero-headline { font-size:24px; margin-top:16px; }
+  .hero-description { font-size:12px; margin-top:12px; }
+  .hero-disciplines { margin-top:10px; }
+  .hero-actions { margin-top:16px; }
+  .hero-contact { width:auto; }
+  .pipeline { padding:12px; }
+  .pipeline-header { padding-bottom:12px; font-size:7px; }
+  .pipeline-flow { padding:14px 8px; }
+  .pipeline-node { padding:5px 10px; }
+  .pipeline-node strong { font-size:11px; }
+  .pipeline-node small { font-size:7px; }
+  .pipeline-connection { height:10px; }
+  .terminal { margin-top:8px; }
+  .scene-ready:not(.scene-static) .hero-scene { top:30px; bottom:85px; left:0; right:0; }
+  .pipeline-caption { font-size:8px; }
+  .hero-footer { padding-top:14px; }
+  .cinematic-background {
+    background-image:url('assets/cloud-city-mobile.webp');
+    background-position:58% center;
+  }
+}
+@media(prefers-reduced-motion:reduce) {
+  .cinematic-background { transform:none !important; translate:none; }
+}
+
+/* Static presentation content, independent of WebGL and scroll state. */
+.system-panel {
+  position:relative;
+  z-index:2;
+  min-width:0;
+  padding:20px 18px;
+  border:1px solid #52d9f035;
+  border-radius:8px;
+  background:linear-gradient(145deg,#10222be8,#080f18ed);
+  box-shadow:0 14px 40px #0003,inset 0 1px 0 #ffffff05;
+  backdrop-filter:blur(10px);
+}
+.system-panel h2 {
+  display:flex; align-items:center; gap:10px;
+  color:#50e7a0;
+  font:600 13px/1.5 var(--mono);
+  letter-spacing:.6px;
+}
+.system-indicator {
+  width:7px; height:7px; flex:none; border-radius:50%;
+  background:#50e7a0; box-shadow:0 0 12px #50e7a040;
+}
+.system-domain { display:flex; justify-content:space-between; gap:12px; margin-top:10px; font-size:12px; color:#c5d6e3; }
+.system-domain span { color:var(--cyan); }
+.system-values { margin:16px 0 0; padding-top:12px; border-top:1px solid var(--line); }
+.system-values > div { display:flex; justify-content:space-between; align-items:baseline; gap:8px; padding:8px 0; }
+.system-values dt { color:var(--muted); font-size:10px; }
+.system-values dd { margin:0; color:var(--cyan); font:11px/1.5 var(--mono); }
+.system-values dd.system-success { color:#50e7a0; }
+.system-caption { margin-top:12px; padding-top:12px; border-top:1px solid var(--line); font:9px/1.6 var(--mono); color:var(--muted); }
+#main > .system-panel { margin:0 max(6vw,24px) 28px; }
+@media(min-width:1280px) {
+  .hero-layout.has-system-panel { grid-template-columns:minmax(0,1.25fr) minmax(0,.85fr) 250px; gap:clamp(20px,2vw,38px); }
+  .hero-layout > .system-panel { align-self:start; margin-top:40px; }
+}
+@media(max-width:1279px) {
+  .system-values { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px 18px; }
+  .system-values > div { display:block; padding:2px 0; }
+  .system-values dd { margin-top:4px; }
+}
+@media(max-width:600px) {
+  .system-panel { padding:16px; }
+  #main > .system-panel { margin-inline:24px; }
+  .system-values { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px 16px; }
 }
