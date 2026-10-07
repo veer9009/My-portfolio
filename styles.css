@@ -9,6 +9,37 @@
   --mono:'DM Mono',monospace
 }
 
+/* Progressive WebGL enhancement: the existing illustration always owns layout. */
+.hero-scene {
+  position:absolute;
+  top:35px;
+  bottom:108px;
+  left:-35px;
+  right:-35px;
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+  z-index:1;
+  background:radial-gradient(ellipse at 50% 45%,#12405b24,transparent 72%);
+}
+.hero-canvas { display:block; width:100%; height:100%; pointer-events:none; }
+.scene-ready .hero-scene { visibility:visible; opacity:1; }
+.scene-ready:not(.scene-static) .pipeline-flow { visibility:hidden; }
+.scene-static .hero-scene { opacity:.18 !important; z-index:0; }
+.scene-static .pipeline-flow { z-index:2; }
+.hero::before {
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background:radial-gradient(ellipse at 82% 45%,#12406430,transparent 55%),linear-gradient(110deg,#080d14,transparent 70%);
+}
+.pipeline-header,.pipeline-caption,.terminal { z-index:2; }
+.production-visual:hover,.portfolio-preview:hover { box-shadow:inset 0 0 0 1px #52d9f04a; }
+.production-visual::after,.portfolio-preview::after {
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background:radial-gradient(ellipse at var(--depth-x,50%) var(--depth-y,50%),#52d9f00c,transparent 60%);
+}
+@media(max-width:900px) { .hero-scene { left:-12px; right:-12px; } }
+@media(prefers-reduced-motion:reduce) { .hero-scene { opacity:.18 !important; } }
+
 * {
   box-sizing:border-box
 }
