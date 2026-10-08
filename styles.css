@@ -1552,8 +1552,24 @@ footer>a:last-child {
 .hero-disciplines { color:#c3d8e5; font-size:12px; margin-top:18px; line-height:1.8; }
 .hero-copy { text-shadow:0 2px 18px #080d14; }
 .hero-layout { min-height:calc(100svh - 205px); }
-.pipeline { padding:18px 14px; border:1px solid #82bed31c; border-radius:6px; background:linear-gradient(140deg,#0b182088,#080d1422); }
-.scene-ready:not(.scene-static) .hero-scene { top:45px; bottom:108px; left:-20px; right:-20px; }
+.hero .pipeline {
+  padding:18px 14px;
+  border:1px solid #82bed335;
+  border-radius:8px;
+  background:linear-gradient(140deg,#091525e8,#08111de0 58%,#101b2bcc);
+  box-shadow:0 24px 70px #0005,inset 0 1px 0 #b3dcff0c;
+}
+.hero .hero-scene {
+  background:radial-gradient(ellipse at 45% 18%,#164d8526,transparent 65%);
+  /* Feather only the outer edge; the five delivery modules stay crisp. */
+  mask-image:linear-gradient(0deg,transparent,#000 5%,#000 95%,transparent);
+}
+.hero .pipeline-glow {
+  background:radial-gradient(ellipse at 35% 35%,#227bff22,transparent 62%),radial-gradient(ellipse at 80% 75%,#ffaf6210,transparent 50%);
+}
+.hero .pipeline-header { color:#aac2d7; border-bottom-color:#71baff26; }
+.hero .terminal { border-color:#71baff26; background:#060d18ed; }
+.scene-ready:not(.scene-static) .hero-scene { top:45px; bottom:136px; left:-20px; right:-20px; }
 .pipeline-stage { color:#b8d9e9; }
 @media(max-width:900px) {
   .hero-layout { gap:24px; }
@@ -1569,7 +1585,7 @@ footer>a:last-child {
   .hero-disciplines { margin-top:10px; }
   .hero-actions { margin-top:16px; }
   .hero-contact { width:auto; }
-  .pipeline { padding:12px; }
+  .hero .pipeline { padding:12px; }
   .pipeline-header { padding-bottom:12px; font-size:7px; }
   .pipeline-flow { padding:14px 8px; }
   .pipeline-node { padding:5px 10px; }
@@ -1577,7 +1593,7 @@ footer>a:last-child {
   .pipeline-node small { font-size:7px; }
   .pipeline-connection { height:10px; }
   .terminal { margin-top:8px; }
-  .scene-ready:not(.scene-static) .hero-scene { top:30px; bottom:85px; left:0; right:0; }
+  .scene-ready:not(.scene-static) .hero-scene { top:30px; bottom:126px; left:0; right:0; }
   .pipeline-caption { font-size:8px; }
   .hero-footer { padding-top:14px; }
   .cinematic-background {
