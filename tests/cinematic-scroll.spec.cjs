@@ -59,7 +59,8 @@ test('settled cinematic hero stops issuing WebGL draw calls', async ({ page }) =
     for (const name of ['drawElements', 'drawArrays']) {
       const original = WebGL2RenderingContext.prototype[name];
       WebGL2RenderingContext.prototype[name] = function(...args) {
-        window.heroDraws++;
+        // The separate AV introduction animates briefly; measure only the hero.
+        if (this.canvas.classList.contains('hero-canvas')) window.heroDraws++;
         return original.apply(this, args);
       };
     }

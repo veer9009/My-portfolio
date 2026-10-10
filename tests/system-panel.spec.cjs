@@ -38,6 +38,8 @@ for (const width of [1920, 1440, 1024, 768, 430, 390]) {
     await expect(page.locator('#home')).toHaveAttribute('data-stage', 'GitHub');
     await visiblePanel(page);
     await panel.scrollIntoViewIfNeeded();
+    // Every refresh now replays the intro; hit testing belongs after its handoff.
+    await expect(page.locator('.av-intro')).toBeHidden({ timeout: 7000 });
     expect(await panel.evaluate(el => {
       const r = el.getBoundingClientRect();
       const header = document.querySelector('.site-header').getBoundingClientRect().bottom;
